@@ -7,47 +7,41 @@ class ExpenseCard extends StatelessWidget {
   final Expense expense;
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(10.0),
-      child: Card(
-        color: const Color.fromARGB(255, 213, 192, 250),
-        child: Padding(
-          padding: const EdgeInsets.all(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                expense.description,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
+    return Card(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(expense.description,
+                style: Theme.of(context).textTheme.titleLarge
+                // .copyWith(backgroundColor: Colors.yellow),
                 ),
-              ),
-              const SizedBox(
-                height: 40,
-              ),
-              Row(
-                children: [
-                  Text(
-                    "\$${expense.amount.toString()}",
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                    ),
+            const SizedBox(
+              height: 4,
+            ),
+            Row(
+              children: [
+                Text(
+                  "\$${expense.amount.toStringAsFixed(2)}",
+                  style: const TextStyle(
+                    fontSize: 15,
                   ),
-                  const Expanded(
-                    child: SizedBox(
-                      width: 20,
-                    ),
-                  ),
-                  Icon(expense.expenseIcon),
-                  Text(
-                    expense.creationDate,
-                  )
-                ],
-              ),
-            ],
-          ),
+                ),
+                const Spacer(),
+                Icon(expense.expenseIcon),
+                const SizedBox(
+                  width: 6,
+                ),
+                Text(
+                  expense.creationDate,
+                )
+              ],
+            ),
+          ],
         ),
       ),
     );

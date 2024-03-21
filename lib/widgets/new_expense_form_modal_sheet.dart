@@ -171,7 +171,7 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
                 const SizedBox(
                   width: 10,
                 ),
-                ElevatedButton(
+                TextButton(
                   onPressed: () {
                     Navigator.pop(context);
                   },

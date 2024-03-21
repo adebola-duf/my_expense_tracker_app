@@ -54,6 +54,10 @@ class _ExpensesAppState extends State<ExpensesApp> {
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
+        backgroundColor:
+            MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? Theme.of(context).colorScheme.onInverseSurface
+                : Theme.of(context).colorScheme.primary,
         content: const Text(
           "Expense Deleted",
           style: TextStyle(
@@ -76,7 +80,6 @@ class _ExpensesAppState extends State<ExpensesApp> {
             top: Radius.circular(10),
           ),
         ),
-        backgroundColor: const Color.fromARGB(255, 145, 93, 235),
       ),
     );
   }
@@ -85,8 +88,6 @@ class _ExpensesAppState extends State<ExpensesApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: const Color.fromARGB(255, 61, 57, 68),
-        foregroundColor: Colors.white,
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
@@ -100,33 +101,25 @@ class _ExpensesAppState extends State<ExpensesApp> {
           "Expense Tracker",
         ),
       ),
-      body: SizedBox(
-        width: double.infinity,
-        height: double.infinity,
-        child: Container(
-          color: const Color.fromARGB(255, 231, 219, 251),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Chart(expenses: _allExpenses),
-              Expanded(
-                child: _allExpenses.isEmpty
-                    ? const Center(
-                        child: Text(
-                          "You have no Expenses",
-                          style: TextStyle(
-                            fontSize: 25,
-                          ),
-                        ),
-                      )
-                    : ExpensesList(
-                        allExpenses: _allExpenses,
-                        onExpenseDismissed: _deleteExpense,
+      body: Column(
+        children: [
+          if (_allExpenses.isNotEmpty) Chart(expenses: _allExpenses),
+          Expanded(
+            child: _allExpenses.isEmpty
+                ? const Center(
+                    child: Text(
+                      "You have no Expenses",
+                      style: TextStyle(
+                        fontSize: 25,
                       ),
-              ),
-            ],
+                    ),
+                  )
+                : ExpensesList(
+                    allExpenses: _allExpenses,
+                    onExpenseDismissed: _deleteExpense,
+                  ),
           ),
-        ),
+        ],
       ),
     );
   }

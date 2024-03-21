@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:my_expense_tracker_app/main.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
 import 'package:my_expense_tracker_app/widgets/expense_card.dart';
 
@@ -16,8 +17,12 @@ class ExpensesList extends StatelessWidget {
         return Dismissible(
           key: ValueKey(allExpenses[index]),
           background: Container(
-            decoration: const BoxDecoration(
-              color: Colors.red,
+            decoration: BoxDecoration(
+              color: kColorScheme.error.withOpacity(0.7),
+              borderRadius: BorderRadius.circular(9),
+            ),
+            margin: EdgeInsets.symmetric(
+              horizontal: Theme.of(context).cardTheme.margin!.horizontal,
             ),
           ),
           onDismissed: (direction) {
