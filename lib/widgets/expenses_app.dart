@@ -14,13 +14,7 @@ class ExpensesApp extends StatefulWidget {
 }
 
 class _ExpensesAppState extends State<ExpensesApp> {
-  final List<Expense> _allExpenses = [
-    Expense(
-      description: "EarPiece",
-      amount: 1500,
-      category: Category.work,
-    ),
-  ];
+  final List<Expense> _allExpenses = [];
 
   void _showModalBottomSheet() {
     showModalBottomSheet(
