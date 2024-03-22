@@ -37,7 +37,6 @@ class Chart extends StatelessWidget {
         vertical: 16,
         horizontal: 8,
       ),
-      width: double.infinity,
       height: 180,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8),
@@ -67,6 +66,8 @@ class Chart extends StatelessWidget {
           Row(
             children: buckets
                 .map(
+                  // The expanded here is to make sure that the icons in the chart are centered under every bar.
+                  // so all the icons would occupy the entire row and they would be the same size
                   (bucket) => Expanded(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 4),

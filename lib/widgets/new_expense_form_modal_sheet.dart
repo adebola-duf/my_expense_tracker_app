@@ -112,7 +112,7 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
                     controller: _amountController,
                     keyboardType: TextInputType.number,
                     decoration: const InputDecoration(
-                      prefixText: "\$",
+                      prefixText: "₦",
                       label: Text("Amount"),
                       hintText: "    Enter the Amount of the expense.",
                       hintStyle: TextStyle(

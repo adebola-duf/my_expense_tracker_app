@@ -16,10 +16,10 @@ class ExpensesApp extends StatefulWidget {
 class _ExpensesAppState extends State<ExpensesApp> {
   final List<Expense> _allExpenses = [
     Expense(
-        description:
-            "Dummy Item: Without this Dummy Item, there is going to be an error",
-        amount: 90,
-        category: Category.flex)
+      description: "EarPiece",
+      amount: 1500,
+      category: Category.work,
+    ),
   ];
 
   void _showModalBottomSheet() {
@@ -86,41 +86,63 @@ class _ExpensesAppState extends State<ExpensesApp> {
 
   @override
   Widget build(BuildContext context) {
+    final availalbleWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-      appBar: AppBar(
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
-            child: IconButton(
-              onPressed: _showModalBottomSheet,
-              icon: const Icon(Icons.add),
+        appBar: AppBar(
+          actions: [
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
+              child: IconButton(
+                onPressed: _showModalBottomSheet,
+                icon: const Icon(Icons.add),
+              ),
             ),
+          ],
+          title: const Text(
+            "Expense Tracker",
           ),
-        ],
-        title: const Text(
-          "Expense Tracker",
         ),
-      ),
-      body: Column(
-        children: [
-          if (_allExpenses.isNotEmpty) Chart(expenses: _allExpenses),
-          Expanded(
-            child: _allExpenses.isEmpty
-                ? const Center(
-                    child: Text(
-                      "You have no Expenses",
-                      style: TextStyle(
-                        fontSize: 25,
-                      ),
-                    ),
-                  )
-                : ExpensesList(
-                    allExpenses: _allExpenses,
-                    onExpenseDismissed: _deleteExpense,
+        body: availalbleWidth <= 600
+            ? Column(
+                children: [
+                  if (_allExpenses.isNotEmpty) Chart(expenses: _allExpenses),
+                  Expanded(
+                    child: _allExpenses.isEmpty
+                        ? const Center(
+                            child: Text(
+                              "You have no Expenses",
+                              style: TextStyle(
+                                fontSize: 25,
+                              ),
+                            ),
+                          )
+                        : ExpensesList(
+                            allExpenses: _allExpenses,
+                            onExpenseDismissed: _deleteExpense,
+                          ),
                   ),
-          ),
-        ],
-      ),
-    );
+                ],
+              )
+            : Row(
+                children: [
+                  if (_allExpenses.isNotEmpty)
+                    Expanded(child: Chart(expenses: _allExpenses)),
+                  Expanded(
+                    child: _allExpenses.isEmpty
+                        ? const Center(
+                            child: Text(
+                              "You have no Expenses",
+                              style: TextStyle(
+                                fontSize: 25,
+                              ),
+                            ),
+                          )
+                        : ExpensesList(
+                            allExpenses: _allExpenses,
+                            onExpenseDismissed: _deleteExpense,
+                          ),
+                  ),
+                ],
+              ));
   }
 }
