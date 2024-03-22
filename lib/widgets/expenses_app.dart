@@ -82,61 +82,62 @@ class _ExpensesAppState extends State<ExpensesApp> {
   Widget build(BuildContext context) {
     final availalbleWidth = MediaQuery.of(context).size.width;
     return Scaffold(
-        appBar: AppBar(
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
-              child: IconButton(
-                onPressed: _showModalBottomSheet,
-                icon: const Icon(Icons.add),
-              ),
+      appBar: AppBar(
+        actions: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
+            child: IconButton(
+              onPressed: _showModalBottomSheet,
+              icon: const Icon(Icons.add),
             ),
-          ],
-          title: const Text(
-            "Expense Tracker",
           ),
+        ],
+        title: const Text(
+          "Expense Tracker",
         ),
-        body: availalbleWidth <= 600
-            ? Column(
-                children: [
-                  if (_allExpenses.isNotEmpty) Chart(expenses: _allExpenses),
-                  Expanded(
-                    child: _allExpenses.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "You have no Expenses",
-                              style: TextStyle(
-                                fontSize: 25,
-                              ),
+      ),
+      body: availalbleWidth <= 600
+          ? Column(
+              children: [
+                if (_allExpenses.isNotEmpty) Chart(expenses: _allExpenses),
+                Expanded(
+                  child: _allExpenses.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "You have no Expenses",
+                            style: TextStyle(
+                              fontSize: 25,
                             ),
-                          )
-                        : ExpensesList(
-                            allExpenses: _allExpenses,
-                            onExpenseDismissed: _deleteExpense,
                           ),
-                  ),
-                ],
-              )
-            : Row(
-                children: [
-                  if (_allExpenses.isNotEmpty)
-                    Expanded(child: Chart(expenses: _allExpenses)),
-                  Expanded(
-                    child: _allExpenses.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "You have no Expenses",
-                              style: TextStyle(
-                                fontSize: 25,
-                              ),
+                        )
+                      : ExpensesList(
+                          allExpenses: _allExpenses,
+                          onExpenseDismissed: _deleteExpense,
+                        ),
+                ),
+              ],
+            )
+          : Row(
+              children: [
+                if (_allExpenses.isNotEmpty)
+                  Expanded(child: Chart(expenses: _allExpenses)),
+                Expanded(
+                  child: _allExpenses.isEmpty
+                      ? const Center(
+                          child: Text(
+                            "You have no Expenses",
+                            style: TextStyle(
+                              fontSize: 25,
                             ),
-                          )
-                        : ExpensesList(
-                            allExpenses: _allExpenses,
-                            onExpenseDismissed: _deleteExpense,
                           ),
-                  ),
-                ],
-              ));
+                        )
+                      : ExpensesList(
+                          allExpenses: _allExpenses,
+                          onExpenseDismissed: _deleteExpense,
+                        ),
+                ),
+              ],
+            ),
+    );
   }
 }
