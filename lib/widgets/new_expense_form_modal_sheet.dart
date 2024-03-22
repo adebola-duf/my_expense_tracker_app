@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
 
@@ -41,12 +42,28 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
     }
   }
 
-  void _submitForm() {
-    var enteredAmount = double.tryParse(_amountController.text);
-    bool invalidAmount = enteredAmount == null || enteredAmount < 0;
-    if (invalidAmount ||
-        _descriptionController.text.trim().isEmpty ||
-        _selectedDate == null) {
+  void _showDialog() {
+    bool isIOS = Theme.of(context).platform == TargetPlatform.iOS;
+    if (isIOS) {
+      showCupertinoDialog(
+        context: context,
+        builder: (ctx) {
+          return CupertinoAlertDialog(
+            title: const Text("Invalid Data"),
+            content: const Text(
+                "You either didn't enter a description, an amount, a date or an invalid amount"),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+                child: const Text("Ok"),
+              )
+            ],
+          );
+        },
+      );
+    } else {
       showDialog(
         context: context,
         builder: (ctx) {
@@ -65,6 +82,16 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
           );
         },
       );
+    }
+  }
+
+  void _submitForm() {
+    var enteredAmount = double.tryParse(_amountController.text);
+    bool invalidAmount = enteredAmount == null || enteredAmount < 0;
+    if (invalidAmount ||
+        _descriptionController.text.trim().isEmpty ||
+        _selectedDate == null) {
+      _showDialog();
       return;
     }
     widget.onSubmitForm(
@@ -83,10 +110,10 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
     return SizedBox(
       width: double.infinity,
       height: double.infinity,
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: EdgeInsets.only(
-              top: 30, bottom: keyboardSize, left: 30, right: 30),
+      child: Padding(
+        padding: EdgeInsets.only(
+            top: 30, bottom: keyboardSize + 30, left: 30, right: 30),
+        child: SingleChildScrollView(
           child: Column(
             children: [
               const SizedBox(
