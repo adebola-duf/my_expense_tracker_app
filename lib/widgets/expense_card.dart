@@ -64,8 +64,8 @@ class ExpenseCard extends StatelessWidget {
                 const SizedBox(
                   width: 6,
                 ),
-                Text(format.format( expense.creationDate)
-                 ,
+                Text(
+                  format.format(expense.dateOfExpense),
                 )
               ],
             ),

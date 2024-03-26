@@ -31,7 +31,7 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
         text: widget.expenseToBeEdited?.amount.toString());
     if (widget.expenseToBeEdited != null) {
       _selectedCategory = widget.expenseToBeEdited!.category;
-      _selectedDate = widget.expenseToBeEdited!.creationDate;
+      _selectedDate = widget.expenseToBeEdited!.dateOfExpense;
       print(_selectedDate);
     }
     super.initState();
@@ -116,6 +116,7 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
       ref.read(allExpensesProvider.notifier).editExpense(
             oldExpense: widget.expenseToBeEdited!,
             newExpense: Expense(
+              dateOfExpense: _selectedDate,
               amount: enteredAmount,
               description: _descriptionController.text,
               category: _selectedCategory,
@@ -128,6 +129,7 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
 
     ref.read(allExpensesProvider.notifier).createExpense(
           Expense(
+            dateOfExpense: _selectedDate,
             description: _descriptionController.text,
             amount: enteredAmount,
             category: _selectedCategory,

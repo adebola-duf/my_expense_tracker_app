@@ -12,11 +12,14 @@ const categoryIcons = {
 };
 
 class Expense {
-  Expense(
-      {required this.description, required this.amount, required this.category})
-      : expenseIcon = categoryIcons[category]!;
+  Expense({
+    required this.description,
+    required this.amount,
+    required this.category,
+    required this.dateOfExpense,
+  }) : expenseIcon = categoryIcons[category]!;
 
-  final DateTime creationDate = DateTime.now();
+  final DateTime dateOfExpense;
   final double amount;
   final Category category;
   final String description;
