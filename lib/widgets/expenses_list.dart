@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_expense_tracker_app/main.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
+import 'package:my_expense_tracker_app/providers/all_expenses_provider.dart';
 import 'package:my_expense_tracker_app/widgets/expense_card.dart';
 
-class ExpensesList extends StatelessWidget {
-  const ExpensesList(
-      {required this.onExpenseDismissed, required this.allExpenses, super.key});
-
-  final void Function(Expense) onExpenseDismissed;
-  final List<Expense> allExpenses;
+class ExpensesList extends ConsumerWidget {
+  const ExpensesList({
+    super.key,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    List<Expense> allExpenses = ref.watch(allExpensesProvider);
     return ListView.builder(
       itemBuilder: (ctx, index) {
         return Dismissible(
@@ -26,7 +27,9 @@ class ExpensesList extends StatelessWidget {
             ),
           ),
           onDismissed: (direction) {
-            onExpenseDismissed(allExpenses[index]);
+            ref
+                .read(allExpensesProvider.notifier)
+                .deleteExpense(allExpenses[index], context);
           },
           child: ExpenseCard(
             expense: allExpenses[index],

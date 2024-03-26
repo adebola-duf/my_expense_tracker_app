@@ -1,22 +1,41 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
+import 'package:my_expense_tracker_app/providers/all_expenses_provider.dart';
 
-class NewExpenseForm extends StatefulWidget {
-  const NewExpenseForm({required this.onSubmitForm, super.key});
+class NewExpenseForm extends ConsumerStatefulWidget {
+  const NewExpenseForm({
+    this.expenseToBeEdited,
+    super.key,
+  });
 
-  final void Function(Expense) onSubmitForm;
+  final Expense? expenseToBeEdited;
 
   @override
-  State<NewExpenseForm> createState() => _NewExpenseFormState();
+  ConsumerState<NewExpenseForm> createState() => _NewExpenseFormState();
 }
 
-class _NewExpenseFormState extends State<NewExpenseForm> {
+class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
   var _selectedCategory = Category.values[0];
   DateTime _selectedDate = DateTime.now();
 
-  final _descriptionController = TextEditingController();
-  final _amountController = TextEditingController();
+  late TextEditingController _descriptionController;
+  late TextEditingController _amountController;
+
+  @override
+  void initState() {
+    _descriptionController =
+        TextEditingController(text: widget.expenseToBeEdited?.description);
+    _amountController = TextEditingController(
+        text: widget.expenseToBeEdited?.amount.toString());
+    if (widget.expenseToBeEdited != null) {
+      _selectedCategory = widget.expenseToBeEdited!.category;
+      _selectedDate = widget.expenseToBeEdited!.creationDate;
+      print(_selectedDate);
+    }
+    super.initState();
+  }
 
   @override
   void dispose() {
@@ -92,13 +111,29 @@ class _NewExpenseFormState extends State<NewExpenseForm> {
       _showDialog();
       return;
     }
-    widget.onSubmitForm(
-      Expense(
-        description: _descriptionController.text,
-        amount: enteredAmount,
-        category: _selectedCategory,
-      ),
-    );
+
+    if (widget.expenseToBeEdited != null) {
+      ref.read(allExpensesProvider.notifier).editExpense(
+            oldExpense: widget.expenseToBeEdited!,
+            newExpense: Expense(
+              amount: enteredAmount,
+              description: _descriptionController.text,
+              category: _selectedCategory,
+            ),
+          );
+      Navigator.pop(context);
+
+      return;
+    }
+
+    ref.read(allExpensesProvider.notifier).createExpense(
+          Expense(
+            description: _descriptionController.text,
+            amount: enteredAmount,
+            category: _selectedCategory,
+          ),
+        );
+
     Navigator.pop(context);
   }
 

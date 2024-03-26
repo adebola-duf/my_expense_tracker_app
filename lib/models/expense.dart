@@ -16,13 +16,12 @@ class Expense {
       {required this.description, required this.amount, required this.category})
       : expenseIcon = categoryIcons[category]!;
 
-  final String creationDate = format.format(DateTime.now());
+  final DateTime creationDate = DateTime.now();
   final double amount;
   final Category category;
   final String description;
 
   final IconData expenseIcon;
-
 }
 
 class ExpenseBucket {

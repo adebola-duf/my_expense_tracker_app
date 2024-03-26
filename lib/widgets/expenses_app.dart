@@ -1,85 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
+import 'package:my_expense_tracker_app/providers/all_expenses_provider.dart';
 import 'package:my_expense_tracker_app/widgets/chart/chart.dart';
 import 'package:my_expense_tracker_app/widgets/expenses_list.dart';
 import 'package:my_expense_tracker_app/widgets/new_expense_form_modal_sheet.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class ExpensesApp extends StatefulWidget {
+class ExpensesApp extends ConsumerStatefulWidget {
   const ExpensesApp({super.key});
 
   @override
-  State<ExpensesApp> createState() {
+  ConsumerState<ExpensesApp> createState() {
     return _ExpensesAppState();
   }
 }
 
-class _ExpensesAppState extends State<ExpensesApp> {
-  final List<Expense> _allExpenses = [];
-
+class _ExpensesAppState extends ConsumerState<ExpensesApp> {
   void _showModalBottomSheet() {
     showModalBottomSheet(
       context: context,
       builder: (ctx) {
-        return NewExpenseForm(
-          onSubmitForm: _createNewExpense,
-        );
+        return const NewExpenseForm();
       },
       isScrollControlled: true,
     );
   }
 
-  void _createNewExpense(Expense newExpense) {
-    setState(() {
-      _allExpenses.add(newExpense);
-    });
-  }
-
-  void _undoDeletingExpense(Expense expense, int expenseIndex) {
-    setState(() {
-      _allExpenses.insert(expenseIndex, expense);
-    });
-  }
-
-  void _deleteExpense(Expense expense) {
-    int indexExpense = _allExpenses.indexOf(expense);
-    setState(() {
-      _allExpenses.remove(expense);
-    });
-    ScaffoldMessenger.of(context).hideCurrentSnackBar();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        backgroundColor:
-            MediaQuery.of(context).platformBrightness == Brightness.dark
-                ? Theme.of(context).colorScheme.onInverseSurface
-                : Theme.of(context).colorScheme.primary,
-        content: const Text(
-          "Expense Deleted",
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-        duration: const Duration(
-          seconds: 2,
-        ),
-        action: SnackBarAction(
-          label: "Undo",
-          textColor: Colors.white,
-          backgroundColor: Colors.black,
-          onPressed: () {
-            _undoDeletingExpense(expense, indexExpense);
-          },
-        ),
-        shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(
-            top: Radius.circular(10),
-          ),
-        ),
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
+    final List<Expense> allExpenses = ref.watch(allExpensesProvider);
+
     final availalbleWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
@@ -99,9 +49,9 @@ class _ExpensesAppState extends State<ExpensesApp> {
       body: availalbleWidth <= 600
           ? Column(
               children: [
-                if (_allExpenses.isNotEmpty) Chart(expenses: _allExpenses),
+                if (allExpenses.isNotEmpty) Chart(expenses: allExpenses),
                 Expanded(
-                  child: _allExpenses.isEmpty
+                  child: allExpenses.isEmpty
                       ? const Center(
                           child: Text(
                             "You have no Expenses",
@@ -110,19 +60,16 @@ class _ExpensesAppState extends State<ExpensesApp> {
                             ),
                           ),
                         )
-                      : ExpensesList(
-                          allExpenses: _allExpenses,
-                          onExpenseDismissed: _deleteExpense,
-                        ),
+                      : const ExpensesList(),
                 ),
               ],
             )
           : Row(
               children: [
-                if (_allExpenses.isNotEmpty)
-                  Expanded(child: Chart(expenses: _allExpenses)),
+                if (allExpenses.isNotEmpty)
+                  Expanded(child: Chart(expenses: allExpenses)),
                 Expanded(
-                  child: _allExpenses.isEmpty
+                  child: allExpenses.isEmpty
                       ? const Center(
                           child: Text(
                             "You have no Expenses",
@@ -131,10 +78,7 @@ class _ExpensesAppState extends State<ExpensesApp> {
                             ),
                           ),
                         )
-                      : ExpensesList(
-                          allExpenses: _allExpenses,
-                          onExpenseDismissed: _deleteExpense,
-                        ),
+                      : const ExpensesList(),
                 ),
               ],
             ),

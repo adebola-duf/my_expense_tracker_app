@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
+import 'package:my_expense_tracker_app/widgets/new_expense_form_modal_sheet.dart';
 
 class ExpenseCard extends StatelessWidget {
-  const ExpenseCard({super.key, required this.expense});
+  const ExpenseCard({
+    super.key,
+    required this.expense,
+  });
 
   final Expense expense;
   @override
@@ -16,10 +20,34 @@ class ExpenseCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(expense.description,
-                style: Theme.of(context).textTheme.titleLarge
-                // .copyWith(backgroundColor: Colors.yellow),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    expense.description,
+                    style: Theme.of(context).textTheme.titleLarge
+                    // .copyWith(backgroundColor: Colors.yellow),,
+                    ,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
+                const Spacer(),
+                IconButton(
+                    onPressed: () {
+                      showModalBottomSheet(
+                        context: context,
+                        builder: (ctx) {
+                          return NewExpenseForm(
+                            expenseToBeEdited: expense,
+                          );
+                        },
+                        isScrollControlled: true,
+                      );
+                    },
+                    icon: const Icon(Icons.edit)),
+              ],
+            ),
             const SizedBox(
               height: 4,
             ),
@@ -36,8 +64,8 @@ class ExpenseCard extends StatelessWidget {
                 const SizedBox(
                   width: 6,
                 ),
-                Text(
-                  expense.creationDate,
+                Text(format.format( expense.creationDate)
+                 ,
                 )
               ],
             ),
