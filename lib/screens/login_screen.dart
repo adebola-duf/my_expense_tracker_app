@@ -47,6 +47,27 @@ class _LoginScreenState extends State<LoginScreen> {
         _isValidCredentials(LoginUser(email: email, password: password));
     if (context.mounted) {
       if (userIsValid) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            duration: Duration(seconds: 1),
+            backgroundColor: Colors.black,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(
+                top: Radius.circular(10),
+              ),
+            ),
+            content: Text(
+              "Login Successful",
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+        await Future.delayed(
+          const Duration(seconds: 1),
+        );
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => const ExpensesAppScreen(),

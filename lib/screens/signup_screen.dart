@@ -42,6 +42,28 @@ class _SignupScreenState extends State<SignupScreen> {
       _isLoading = true;
     });
     await Future.delayed(const Duration(seconds: 2));
+    setState(() {
+      _isLoading = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        duration: Duration(seconds: 1),
+        backgroundColor: Colors.black,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(10),
+          ),
+        ),
+        content: Text(
+          "Your account has been created successfully.",
+          style: TextStyle(color: Colors.white),
+        ),
+      ),
+    );
+
+    await Future.delayed(
+      const Duration(seconds: 1),
+    );
 
     _goToLoginPage();
   }

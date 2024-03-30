@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
 import 'package:my_expense_tracker_app/providers/all_expenses_provider.dart';
+import 'package:my_expense_tracker_app/screens/login_screen.dart';
 import 'package:my_expense_tracker_app/widgets/chart/chart.dart';
 import 'package:my_expense_tracker_app/widgets/expenses_list.dart';
 import 'package:my_expense_tracker_app/widgets/new_expense_form_modal_sheet.dart';
@@ -26,12 +27,36 @@ class _ExpensesAppScreenState extends ConsumerState<ExpensesAppScreen> {
     );
   }
 
+  void _logUserOut() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => const LoginScreen(),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Expense> allExpenses = ref.watch(allExpensesProvider);
 
     final availalbleWidth = MediaQuery.of(context).size.width;
     return Scaffold(
+      drawer: Drawer(
+        child: Column(
+          children: [
+            const DrawerHeader(
+              child: CircleAvatar(
+                backgroundColor: Colors.deepPurple,
+              ),
+            ),
+            TextButton.icon(
+              onPressed: _logUserOut,
+              icon: const Icon(Icons.logout),
+              label: const Text("LOG OUT"),
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         actions: [
           Padding(
