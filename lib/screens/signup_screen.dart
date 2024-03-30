@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:my_expense_tracker_app/models/user.dart';
 import 'package:my_expense_tracker_app/screens/login_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -25,47 +27,66 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   bool _isLoading = false;
-  void _signup() async {
+
+  Future<int> _sendRequest() async {
     String firstName = _firstnameTextController.text;
     String lastName = _lastnameTextController.text;
     String email = _emailTextController.text;
     String password = _passwordTextController.text;
+    final url = Uri.http('localhost:8000', '/create-user');
 
-    SignupUser newUser = SignupUser(
-        email: email,
-        password: password,
-        firstName: firstName,
-        lastName: lastName);
-    myUsers.add(newUser);
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        "first_name": firstName,
+        "last_name": lastName,
+        "email": email,
+        "password": password
+      }),
+    );
 
-    setState(() {
-      _isLoading = true;
-    });
-    await Future.delayed(const Duration(seconds: 2));
-    setState(() {
-      _isLoading = false;
-    });
+    return response.statusCode;
+  }
+
+  void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        duration: Duration(seconds: 1),
+      SnackBar(
+        duration: const Duration(seconds: 1),
         backgroundColor: Colors.black,
-        shape: RoundedRectangleBorder(
+        shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
             top: Radius.circular(10),
           ),
         ),
         content: Text(
-          "Your account has been created successfully.",
-          style: TextStyle(color: Colors.white),
+          message,
+          style: const TextStyle(color: Colors.white),
         ),
       ),
     );
+  }
 
-    await Future.delayed(
-      const Duration(seconds: 1),
-    );
+  void _signup() async {
+    setState(() {
+      _isLoading = true;
+    });
+    final int resStatusCode = await _sendRequest();
+    setState(() {
+      _isLoading = false;
+    });
+    if (resStatusCode == 200) {
+      _showSnackBar("Your account has been created successfully. Sign In");
 
-    _goToLoginPage();
+      _goToLoginPage();
+    }
+
+    if (resStatusCode == 409) {
+      _showSnackBar("You already have an account. Sign in instead");
+      _goToLoginPage();
+    }
   }
 
   void _goToLoginPage() {

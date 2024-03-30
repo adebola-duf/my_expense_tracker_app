@@ -17,7 +17,9 @@ var kDarkColorScheme = ColorScheme.fromSeed(
 );
 
 void main() {
-  runApp(const MyExpenseTrackerApp());
+  runApp(
+    const MyExpenseTrackerApp(),
+  );
 }
 
 class MyExpenseTrackerApp extends StatelessWidget {
