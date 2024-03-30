@@ -9,14 +9,15 @@ class User(SQLModel, table=True):
     expenses: list["Expenses"] = Relationship(back_populates="user")
     
 # this model is for user validation because when you set table = true, it can't be used for validation
-class UserValidation(SQLModel):
+class UserCreateValidation(SQLModel):
     first_name: str
     last_name: str
     email: str = Field(primary_key=True)
     password: str
-    expenses: list["Expenses"] = Relationship(back_populates="user")
-    
 
+class UserVerifyValidation(SQLModel):
+    password: str
+    email: str
 
 from datetime import datetime
 class Expenses(SQLModel, table=True):

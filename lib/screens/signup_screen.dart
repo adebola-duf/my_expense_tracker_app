@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:my_expense_tracker_app/models/user.dart';
 import 'package:my_expense_tracker_app/screens/login_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -28,13 +27,16 @@ class _SignupScreenState extends State<SignupScreen> {
 
   bool _isLoading = false;
 
-  Future<int> _sendRequest() async {
+  Future<http.Response> _sendRequest() async {
     String firstName = _firstnameTextController.text;
     String lastName = _lastnameTextController.text;
     String email = _emailTextController.text;
     String password = _passwordTextController.text;
-    final url = Uri.http('localhost:8000', '/create-user');
 
+    final url = Uri.http('localhost:8000', '/create-user');
+    setState(() {
+      _isLoading = true;
+    });
     final response = await http.post(
       url,
       headers: {
@@ -47,14 +49,18 @@ class _SignupScreenState extends State<SignupScreen> {
         "password": password
       }),
     );
+    setState(() {
+      _isLoading = false;
+    });
 
-    return response.statusCode;
+    return response;
   }
 
   void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        duration: const Duration(seconds: 1),
+        duration: const Duration(seconds: 2),
         backgroundColor: Colors.black,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(
@@ -70,20 +76,14 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _signup() async {
-    setState(() {
-      _isLoading = true;
-    });
-    final int resStatusCode = await _sendRequest();
-    setState(() {
-      _isLoading = false;
-    });
-    if (resStatusCode == 200) {
-      _showSnackBar("Your account has been created successfully. Sign In");
+    final http.Response response = await _sendRequest();
 
+    if (response.statusCode == 200) {
+      _showSnackBar("Your account has been created successfully. Sign In");
       _goToLoginPage();
     }
 
-    if (resStatusCode == 409) {
+    if (response.statusCode == 409) {
       _showSnackBar("You already have an account. Sign in instead");
       _goToLoginPage();
     }

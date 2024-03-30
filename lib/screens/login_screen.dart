@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:my_expense_tracker_app/models/user.dart';
 import 'package:my_expense_tracker_app/screens/expenses_app_screen.dart';
 import 'package:my_expense_tracker_app/screens/signup_screen.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,68 +25,66 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  bool _isValidCredentials(LoginUser user) {
-    for (final eachUser in myUsers) {
-      if (eachUser.email == user.email && eachUser.password == user.password) {
-        return true;
-      }
-    }
-    return false;
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        duration: const Duration(seconds: 2),
+        backgroundColor: Colors.black,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(10),
+          ),
+        ),
+        content: Text(
+          message,
+          style: const TextStyle(color: Colors.white),
+        ),
+      ),
+    );
   }
 
-  void _attemptLogin() async {
+  Future<http.Response> _sendRequest() async {
     String email = _emailTextController.text;
     String password = _passwordTextController.text;
+
+    final url = Uri.http('localhost:8000', '/verify-user');
     setState(() {
       _isLoading = true;
     });
-
-    await Future.delayed(
-      const Duration(seconds: 2),
+    final response = await http.post(
+      url,
+      body: json.encode({
+        "email": email,
+        "password": password,
+      }),
+      headers: {'Content-Type': 'application/json'},
     );
+    setState(() {
+      _isLoading = false;
+    });
 
-    bool userIsValid =
-        _isValidCredentials(LoginUser(email: email, password: password));
-    if (context.mounted) {
-      if (userIsValid) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            duration: Duration(seconds: 1),
-            backgroundColor: Colors.black,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(10),
-              ),
-            ),
-            content: Text(
-              "Login Successful",
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
-        );
-        setState(() {
-          _isLoading = false;
-        });
-        await Future.delayed(
-          const Duration(seconds: 1),
-        );
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => const ExpensesAppScreen(),
-          ),
-        );
-      } else {
-        showAdaptiveDialog(
-          context: context,
-          builder: (context) => const AlertDialog.adaptive(
-            title: Text("You suck bro"),
-          ),
-        );
-      }
-      setState(() {
-        _isLoading = false;
-      });
+    return response;
+  }
+
+  void _attemptLogin() async {
+    final http.Response response = await _sendRequest();
+    if (response.statusCode == 200) {
+      _showSnackBar('Login successful');
+      _goToExpenseAppPage();
     }
+
+    if (response.statusCode == 401) {
+      _showSnackBar(json.decode(response.body)['detail']);
+    }
+  }
+
+  void _goToExpenseAppPage() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => const ExpensesAppScreen(),
+      ),
+    );
   }
 
   void _goToSignupPage() {
