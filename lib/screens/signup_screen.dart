@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:my_expense_tracker_app/models/user.dart';
-import 'package:my_expense_tracker_app/screens/expenses_app_screen.dart';
 import 'package:my_expense_tracker_app/screens/login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -25,7 +24,8 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
-  void _signup() {
+  bool _isLoading = false;
+  void _signup() async {
     String firstName = _firstnameTextController.text;
     String lastName = _lastnameTextController.text;
     String email = _emailTextController.text;
@@ -37,11 +37,13 @@ class _SignupScreenState extends State<SignupScreen> {
         firstName: firstName,
         lastName: lastName);
     myUsers.add(newUser);
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(
-        builder: (context) => const ExpensesAppScreen(),
-      ),
-    );
+
+    setState(() {
+      _isLoading = true;
+    });
+    await Future.delayed(const Duration(seconds: 2));
+
+    _goToLoginPage();
   }
 
   void _goToLoginPage() {
@@ -54,6 +56,7 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget buttonContent = const Text("SIGNUP");
     return Scaffold(
       appBar: AppBar(
         title: const Text("Signup"),
@@ -93,7 +96,6 @@ class _SignupScreenState extends State<SignupScreen> {
               TextField(
                 controller: _lastnameTextController,
                 decoration: InputDecoration(
-
                   label: const Text("LASTNAME"),
                   labelStyle: const TextStyle(fontSize: 10),
                   icon: const Icon(Icons.person),
@@ -137,7 +139,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Column(
                   children: [
                     InkWell(
-                      onTap: _signup,
+                      onTap: _isLoading ? null : _signup,
                       borderRadius: BorderRadius.circular(23),
                       child: Container(
                         alignment: Alignment.center,
@@ -147,10 +149,9 @@ class _SignupScreenState extends State<SignupScreen> {
                           color: Theme.of(context).colorScheme.primaryContainer,
                           borderRadius: BorderRadius.circular(23),
                         ),
-                        child: const Text(
-                          "SIGN UP",
-                          style: TextStyle(color: Colors.white),
-                        ),
+                        child: _isLoading == false
+                            ? buttonContent
+                            : const CircularProgressIndicator(),
                       ),
                     ),
                     const SizedBox(

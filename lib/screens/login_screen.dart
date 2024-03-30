@@ -14,6 +14,8 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
 
+  bool _isLoading = false;
+
   @override
   void dispose() {
     _emailTextController.dispose();
@@ -30,25 +32,37 @@ class _LoginScreenState extends State<LoginScreen> {
     return false;
   }
 
-  void _attemptLogin() {
+  void _attemptLogin() async {
     String email = _emailTextController.text;
     String password = _passwordTextController.text;
+    setState(() {
+      _isLoading = true;
+    });
+
+    await Future.delayed(
+      const Duration(seconds: 2),
+    );
 
     bool userIsValid =
         _isValidCredentials(LoginUser(email: email, password: password));
-    if (userIsValid) {
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (context) => const ExpensesAppScreen(),
-        ),
-      );
-    } else {
-      showAdaptiveDialog(
-        context: context,
-        builder: (context) => const AlertDialog.adaptive(
-          title: Text("You suck bro"),
-        ),
-      );
+    if (context.mounted) {
+      if (userIsValid) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => const ExpensesAppScreen(),
+          ),
+        );
+      } else {
+        showAdaptiveDialog(
+          context: context,
+          builder: (context) => const AlertDialog.adaptive(
+            title: Text("You suck bro"),
+          ),
+        );
+      }
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -62,6 +76,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    Widget logingButtonContent = const Text("LOGIN");
     return Scaffold(
       appBar: AppBar(
         title: const Text("Login"),
@@ -126,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 children: [
                   InkWell(
-                    onTap: _attemptLogin,
+                    onTap: _isLoading ? null : _attemptLogin,
                     borderRadius: BorderRadius.circular(23),
                     child: Container(
                       alignment: Alignment.center,
@@ -136,10 +151,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: Theme.of(context).colorScheme.primaryContainer,
                         borderRadius: BorderRadius.circular(23),
                       ),
-                      child: const Text(
-                        "login",
-                        style: TextStyle(color: Colors.white),
-                      ),
+                      child: _isLoading
+                          ? const CircularProgressIndicator()
+                          : logingButtonContent,
                     ),
                   ),
                   const SizedBox(
