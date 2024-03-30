@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:my_expense_tracker_app/widgets/expenses_app.dart';
+import 'package:my_expense_tracker_app/screens/login_screen.dart';
 
 // with this color scheme, you define one color scheme and flutter infers different shade of colros for different widgets
 // this .fromSeed constructor function creates your  color scheme based on one color you select - the seed color
@@ -17,8 +17,15 @@ var kDarkColorScheme = ColorScheme.fromSeed(
 );
 
 void main() {
-  runApp(
-    ProviderScope(
+  runApp(const MyExpenseTrackerApp());
+}
+
+class MyExpenseTrackerApp extends StatelessWidget {
+  const MyExpenseTrackerApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return ProviderScope(
       child: MaterialApp(
         // if you create a ThemeData object like this by instantiating ThemeData like this and passing some configurations to it,
         // What you are telling flutter is that you are setting up the entire theme from scratch, which means that you should configure
@@ -78,8 +85,8 @@ void main() {
         // Thememode pretty much tells flutter which of the defined themes to use. Either the light theme or the dark theme
         themeMode: ThemeMode.system,
         debugShowCheckedModeBanner: false,
-        home: const ExpensesApp(),
+        home: const LoginScreen(),
       ),
-    ),
-  );
+    );
+  }
 }

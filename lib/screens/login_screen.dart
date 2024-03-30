@@ -53,7 +53,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _goToSignupPage() {
-    Navigator.of(context).push(
+    Navigator.of(context).pushReplacement(
       MaterialPageRoute(
         builder: (context) => const SignupScreen(),
       ),
@@ -98,6 +98,7 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: _emailTextController,
               decoration: InputDecoration(
                 label: const Text("EMAIL"),
+                labelStyle: const TextStyle(fontSize: 10),
                 icon: const Icon(Icons.mail),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
@@ -111,6 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
               controller: _passwordTextController,
               decoration: InputDecoration(
                 label: const Text("PASSWORD"),
+                labelStyle: const TextStyle(fontSize: 10),
                 icon: const Icon(Icons.lock),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(10),
