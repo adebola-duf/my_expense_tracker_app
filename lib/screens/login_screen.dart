@@ -65,9 +65,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   Future<List<dynamic>> _getAllExpenses() async {
     final url = Uri.http('localhost:8000', '/get-expenses/$_email');
-
     final http.Response response = await http.get(url);
-
     return json.decode(response.body);
   }
 
