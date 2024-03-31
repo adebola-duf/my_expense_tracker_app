@@ -17,6 +17,7 @@ class LoginScreen extends ConsumerStatefulWidget {
 
 class _LoginScreenState extends ConsumerState<LoginScreen> {
   bool _isLoading = false;
+  bool _obscureText = true;
 
   late String _email;
   late String _password;
@@ -71,6 +72,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
   void _attemptLogin() async {
     bool emailAndPasswordIsValid = _setEmailAndPassword();
+
     if (emailAndPasswordIsValid) {
       final http.Response response = await _sendRequest();
       if (response.statusCode == 200) {
@@ -177,9 +179,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     return null;
                   },
                   decoration: InputDecoration(
+                    prefixIcon: const Icon(Icons.mail),
                     label: const Text("EMAIL"),
                     labelStyle: const TextStyle(fontSize: 10),
-                    icon: const Icon(Icons.mail),
+                    // icon: const Icon(Icons.mail),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -199,11 +202,25 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     }
                     return null;
                   },
-                  obscureText: true,
+                  obscureText: _obscureText,
                   decoration: InputDecoration(
                     label: const Text("PASSWORD"),
                     labelStyle: const TextStyle(fontSize: 10),
-                    icon: const Icon(Icons.lock),
+                    // icon: const Icon(Icons.lock),
+                    prefixIcon: const Icon(Icons.lock),
+                    suffixIcon: Padding(
+                      padding: const EdgeInsets.only(right: 10.0),
+                      child: IconButton(
+                        icon: _obscureText
+                            ? const Icon(Icons.visibility_off)
+                            : const Icon(Icons.visibility),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
+                    ),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),

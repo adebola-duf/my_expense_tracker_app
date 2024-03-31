@@ -11,7 +11,7 @@ class ExpensesList extends ConsumerWidget {
     super.key,
   });
 
-  void _sendDeleteRequest(DateTime expenseId) async {
+  void _sendDeleteExpenseRequest(DateTime expenseId) async {
     final url =
         Uri.http('localhost:8000', '/delete-expense/${expenseId.toString()}');
     await http.delete(url);
@@ -34,7 +34,7 @@ class ExpensesList extends ConsumerWidget {
             ),
           ),
           onDismissed: (direction) {
-            _sendDeleteRequest(allExpenses[index].id);
+            _sendDeleteExpenseRequest(allExpenses[index].id);
             ref
                 .read(allExpensesProvider.notifier)
                 .deleteExpense(allExpenses[index], context);

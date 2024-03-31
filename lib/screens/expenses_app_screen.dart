@@ -46,7 +46,9 @@ class _ExpensesAppScreenState extends ConsumerState<ExpensesAppScreen> {
           children: [
             const DrawerHeader(
               child: CircleAvatar(
-                backgroundColor: Colors.deepPurple,
+                backgroundImage: AssetImage(
+                  'bola\'s_avatar.jpeg',
+                ),
               ),
             ),
             TextButton.icon(

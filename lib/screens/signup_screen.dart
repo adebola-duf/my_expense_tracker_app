@@ -22,6 +22,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   bool _isLoading = false;
+  bool _obscureText = true;
 
   Future<http.Response> _sendRequest() async {
     final url = Uri.http('localhost:8000', '/create-user');
@@ -198,7 +199,21 @@ class _SignupScreenState extends State<SignupScreen> {
                     }
                     return null;
                   },
+                  obscureText: _obscureText,
                   decoration: InputDecoration(
+                    suffixIcon: Padding(
+                      padding: const EdgeInsets.only(right: 10.0),
+                      child: IconButton(
+                        icon: _obscureText
+                            ? const Icon(Icons.visibility_off)
+                            : const Icon(Icons.visibility),
+                        onPressed: () {
+                          setState(() {
+                            _obscureText = !_obscureText;
+                          });
+                        },
+                      ),
+                    ),
                     label: const Text("PASSWORD"),
                     labelStyle: const TextStyle(fontSize: 10),
                     icon: const Icon(Icons.lock),
