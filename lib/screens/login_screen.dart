@@ -1,18 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_expense_tracker_app/models/user.dart';
+import 'package:my_expense_tracker_app/providers/all_expenses_provider.dart';
+import 'package:my_expense_tracker_app/providers/user_info_provider.dart';
 import 'package:my_expense_tracker_app/screens/expenses_app_screen.dart';
 import 'package:my_expense_tracker_app/screens/signup_screen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final _emailTextController = TextEditingController();
   final _passwordTextController = TextEditingController();
 
@@ -44,9 +47,11 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  late String _email;
+  late String _password;
   Future<http.Response> _sendRequest() async {
-    String email = _emailTextController.text;
-    String password = _passwordTextController.text;
+    _email = _emailTextController.text;
+    _password = _passwordTextController.text;
 
     final url = Uri.http('localhost:8000', '/verify-user');
     setState(() {
@@ -55,21 +60,42 @@ class _LoginScreenState extends State<LoginScreen> {
     final response = await http.post(
       url,
       body: json.encode({
-        "email": email,
-        "password": password,
+        "email": _email,
+        "password": _password,
       }),
       headers: {'Content-Type': 'application/json'},
     );
-    setState(() {
-      _isLoading = false;
-    });
 
     return response;
+  }
+
+  Future<List<dynamic>> _getAllExpenses() async {
+    final url = Uri.http('localhost:8000', '/get-expenses/$_email');
+
+    final http.Response response = await http.get(url);
+
+    return json.decode(response.body);
   }
 
   void _attemptLogin() async {
     final http.Response response = await _sendRequest();
     if (response.statusCode == 200) {
+      final userMap = json.decode(response.body);
+      ref.read(userInfoProvider.notifier).setUserObject(
+            User(
+              email: userMap['email'],
+              password: userMap['password'],
+              // firstName: userMap['first_name'],
+              // lastName: userMap['last_name'],
+            ),
+          );
+      ref
+          .read(allExpensesProvider.notifier)
+          .setAllExpenses(await _getAllExpenses());
+      setState(() {
+        _isLoading = false;
+      });
+
       _showSnackBar('Login successful');
       _goToExpenseAppPage();
     }
@@ -77,6 +103,9 @@ class _LoginScreenState extends State<LoginScreen> {
     if (response.statusCode == 401) {
       _showSnackBar(json.decode(response.body)['detail']);
     }
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   void _goToExpenseAppPage() {

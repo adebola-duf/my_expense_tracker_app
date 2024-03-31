@@ -1,8 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
 import 'package:my_expense_tracker_app/providers/all_expenses_provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:my_expense_tracker_app/providers/user_info_provider.dart';
 
 class NewExpenseForm extends ConsumerStatefulWidget {
   const NewExpenseForm({
@@ -32,7 +36,6 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
     if (widget.expenseToBeEdited != null) {
       _selectedCategory = widget.expenseToBeEdited!.category;
       _selectedDate = widget.expenseToBeEdited!.dateOfExpense;
-      print(_selectedDate);
     }
     super.initState();
   }
@@ -104,7 +107,28 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
     }
   }
 
-  void _submitForm() {
+  Future<http.Response> _sendRequest(Expense expense) async {
+    final url = Uri.http('localhost:8000', '/create-expense');
+
+    final http.Response response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(
+        {
+          'description': expense.description,
+          'category_name': expense.category.name,
+          'amount': expense.amount,
+          'expense_date': expense.dateOfExpense.toString(),
+          'user_email': ref.watch(userInfoProvider).email,
+        },
+      ),
+    );
+    return response;
+  }
+
+  void _submitForm() async {
     var enteredAmount = double.tryParse(_amountController.text);
     bool invalidAmount = enteredAmount == null || enteredAmount < 0;
     if (invalidAmount || _descriptionController.text.trim().isEmpty) {
@@ -127,16 +151,18 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
       return;
     }
 
-    ref.read(allExpensesProvider.notifier).createExpense(
-          Expense(
-            dateOfExpense: _selectedDate,
-            description: _descriptionController.text,
-            amount: enteredAmount,
-            category: _selectedCategory,
-          ),
-        );
+    final Expense expense = Expense(
+      dateOfExpense: _selectedDate,
+      description: _descriptionController.text,
+      amount: enteredAmount,
+      category: _selectedCategory,
+    );
 
-    Navigator.pop(context);
+    final response = await _sendRequest(expense);
+    if (response.statusCode == 200) {
+      ref.read(allExpensesProvider.notifier).createExpense(expense);
+      Navigator.pop(context);
+    }
   }
 
   @override

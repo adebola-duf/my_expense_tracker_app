@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
+import 'package:http/http.dart' as http;
 
 class AllExpensesNotifier extends StateNotifier<List<Expense>> {
   AllExpensesNotifier() : super([]);
@@ -15,6 +16,8 @@ class AllExpensesNotifier extends StateNotifier<List<Expense>> {
 
   void createExpense(expense) {
     state = [...state, expense];
+
+    final url = Uri.http('localhost:8000', '/get-expenses');
   }
 
   void deleteExpense(Expense expense, BuildContext context) {
@@ -62,6 +65,33 @@ class AllExpensesNotifier extends StateNotifier<List<Expense>> {
     state = tempState;
   }
 
+  void setAllExpenses(List<dynamic> allExpensesMap) {
+    final List<Expense> allExpenses = [];
+
+    for (final expenseMap in allExpensesMap) {
+      allExpenses.add(
+        Expense(
+          description: expenseMap['description'],
+          amount: expenseMap['amount'],
+          category: whichCategory(expenseMap['category_name']),
+          dateOfExpense: DateTime.parse(expenseMap['expense_date']),
+        ),
+      );
+    }
+    state = allExpenses;
+  }
+}
+
+Category whichCategory(String categoryName) {
+  if (categoryName == Category.flex.name) {
+    return Category.flex;
+  } else if (categoryName == Category.food.name) {
+    return Category.food;
+  } else if (categoryName == Category.work.name) {
+    return Category.work;
+  } else {
+    return Category.travel;
+  }
 }
 
 final allExpensesProvider =

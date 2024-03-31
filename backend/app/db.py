@@ -1,11 +1,10 @@
 import os
 from dotenv import load_dotenv
 from sqlmodel import SQLModel, create_engine
-from .models import User, Expenses
+from .models import User, Expense
 
 load_dotenv(".env")
 db_url = os.getenv("DB_URL")
-print(db_url)
 
 engine = create_engine(db_url, echo=False)
 
