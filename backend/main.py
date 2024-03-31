@@ -1,9 +1,10 @@
+from datetime import datetime
 from fastapi import FastAPI, HTTPException, status
 from sqlmodel import Session
 
 from app.db import engine
 from app.models import Expense, BaseUser, UserCreate, UserRead, ExpenseRead, ExpenseCreate, ExpenseUpdate
-from app.crud import create_user, verify_user, create_expense, get_expenses, update_expense
+from app.crud import create_user, verify_user, create_expense, get_expenses, update_expense, delete_expense
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
@@ -62,9 +63,11 @@ def get_expenses_(user_email: str):
     return all_expenses
 
 
-@app.delete(path="/delete-expense")
-def delete_expense():
-    pass
+@app.delete(path="/delete-expense/{expense_id}")
+def delete_expense_(expense_id: datetime):
+    with Session(engine) as session:
+        success = delete_expense(session=session, expense_id=expense_id)
+    return success
 
 
 @app.put(path="/update-expense/", response_model=ExpenseRead)

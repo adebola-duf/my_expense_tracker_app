@@ -4,11 +4,18 @@ import 'package:my_expense_tracker_app/main.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
 import 'package:my_expense_tracker_app/providers/all_expenses_provider.dart';
 import 'package:my_expense_tracker_app/widgets/expense_card.dart';
+import 'package:http/http.dart' as http;
 
 class ExpensesList extends ConsumerWidget {
   const ExpensesList({
     super.key,
   });
+
+  void _sendDeleteRequest(DateTime expenseId) async {
+    final url =
+        Uri.http('localhost:8000', '/delete-expense/${expenseId.toString()}');
+    await http.delete(url);
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -27,6 +34,7 @@ class ExpensesList extends ConsumerWidget {
             ),
           ),
           onDismissed: (direction) {
+            _sendDeleteRequest(allExpenses[index].id);
             ref
                 .read(allExpensesProvider.notifier)
                 .deleteExpense(allExpenses[index], context);

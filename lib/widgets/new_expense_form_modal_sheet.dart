@@ -23,6 +23,7 @@ class NewExpenseForm extends ConsumerStatefulWidget {
 class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
   var _selectedCategory = Category.values[0];
   DateTime _selectedDate = DateTime.now();
+  bool _isLoading = false;
 
   late TextEditingController _descriptionController;
   late TextEditingController _amountController;
@@ -109,7 +110,9 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
 
   Future<http.Response> _sendCreateExpenseRequest(Expense expense) async {
     final url = Uri.http('localhost:8000', '/create-expense');
-
+    setState(() {
+      _isLoading = true;
+    });
     final http.Response response = await http.post(
       url,
       headers: {
@@ -126,12 +129,17 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
         },
       ),
     );
+    setState(() {
+      _isLoading = false;
+    });
     return response;
   }
 
   Future<http.Response> _sendUpdateExpenseRequest(Expense newExpense) async {
     final url = Uri.http('localhost:8000', '/update-expense/');
-
+    setState(() {
+      _isLoading = true;
+    });
     final response = await http.put(
       url,
       body: json.encode(
@@ -145,7 +153,9 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
       ),
       headers: {'Content-Type': 'application/json'},
     );
-
+    setState(() {
+      _isLoading = false;
+    });
     return response;
   }
 
@@ -293,9 +303,15 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
                       const Spacer(),
                       ElevatedButton(
                         onPressed: _submitForm,
-                        child: const Text(
-                          "Save expense",
-                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 10,
+                                width: 10,
+                                child: CircularProgressIndicator(),
+                              )
+                            : const Text(
+                                "Save expense",
+                              ),
                       ),
                       const SizedBox(
                         width: 10,

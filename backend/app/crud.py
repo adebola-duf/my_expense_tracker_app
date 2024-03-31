@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlmodel import Session, select
 from .models import UserCreate, User, BaseUser, ExpenseCreate, Expense, ExpenseUpdate
 
@@ -14,14 +15,14 @@ def create_user(session: Session, user: UserCreate) -> User | None:
 
 
 def verify_user(session: Session, user: BaseUser) -> User | None:
-    user = session.get(User, user.email)
-    if not user:
+    db_user = session.get(User, user.email)
+    if not db_user:
         return None
 
-    if user.password != user.password:
+    if db_user.password != user.password:
         return None
 
-    return user
+    return db_user
 
 
 def create_expense(session: Session, expense: ExpenseCreate) -> Expense | None:
@@ -49,3 +50,10 @@ def update_expense(session: Session, updated_expense: ExpenseUpdate) -> Expense:
     session.commit()
     session.refresh(old_expense)
     return old_expense
+
+
+def delete_expense(session: Session, expense_id: datetime):
+    expense = session.get(Expense, expense_id)
+    session.delete(expense)
+    session.commit()
+    return True
