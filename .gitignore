@@ -44,3 +44,4 @@ app.*.map.json
 
 .vscode/
 test.py
+backend/expenses_dummy_db.db

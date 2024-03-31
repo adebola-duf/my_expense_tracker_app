@@ -6,9 +6,8 @@ class UserInfoNotifier extends StateNotifier<User> {
       : super(
           const User(
             email: "noone",
-            password: "noone",
-            // firstName: "noone",
-            // lastName: "noone",
+            firstName: "noone",
+            lastName: "noone",
           ),
         );
 

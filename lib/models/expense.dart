@@ -13,12 +13,14 @@ const categoryIcons = {
 
 class Expense {
   Expense({
+    required this.id,
     required this.description,
     required this.amount,
     required this.category,
     required this.dateOfExpense,
   }) : expenseIcon = categoryIcons[category]!;
 
+  final DateTime id;
   final DateTime dateOfExpense;
   final double amount;
   final Category category;

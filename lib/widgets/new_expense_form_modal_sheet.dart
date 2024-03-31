@@ -107,7 +107,7 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
     }
   }
 
-  Future<http.Response> _sendRequest(Expense expense) async {
+  Future<http.Response> _sendCreateExpenseRequest(Expense expense) async {
     final url = Uri.http('localhost:8000', '/create-expense');
 
     final http.Response response = await http.post(
@@ -117,6 +117,7 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
       },
       body: json.encode(
         {
+          'id': expense.id.toString(),
           'description': expense.description,
           'category_name': expense.category.name,
           'amount': expense.amount,
@@ -128,6 +129,26 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
     return response;
   }
 
+  Future<http.Response> _sendUpdateExpenseRequest(Expense newExpense) async {
+    final url = Uri.http('localhost:8000', '/update-expense/');
+
+    final response = await http.put(
+      url,
+      body: json.encode(
+        {
+          'id': newExpense.id.toString(),
+          'description': newExpense.description,
+          'category_name': newExpense.category.name,
+          'amount': newExpense.amount,
+          'expense_date': newExpense.dateOfExpense.toString(),
+        },
+      ),
+      headers: {'Content-Type': 'application/json'},
+    );
+
+    return response;
+  }
+
   void _submitForm() async {
     var enteredAmount = double.tryParse(_amountController.text);
     bool invalidAmount = enteredAmount == null || enteredAmount < 0;
@@ -136,29 +157,44 @@ class _NewExpenseFormState extends ConsumerState<NewExpenseForm> {
       return;
     }
 
+    // if widget.expenseToBeEdited != null we want to edit an expense
     if (widget.expenseToBeEdited != null) {
-      ref.read(allExpensesProvider.notifier).editExpense(
-            oldExpense: widget.expenseToBeEdited!,
-            newExpense: Expense(
-              dateOfExpense: _selectedDate,
-              amount: enteredAmount,
-              description: _descriptionController.text,
-              category: _selectedCategory,
-            ),
-          );
-      Navigator.pop(context);
+      final response = await _sendUpdateExpenseRequest(
+        Expense(
+          id: widget.expenseToBeEdited!.id,
+          dateOfExpense: _selectedDate,
+          amount: enteredAmount,
+          description: _descriptionController.text,
+          category: _selectedCategory,
+        ),
+      );
 
-      return;
+      if (response.statusCode == 200) {
+        ref.read(allExpensesProvider.notifier).updateExpense(
+              oldExpense: widget.expenseToBeEdited!,
+              newExpense: Expense(
+                id: widget.expenseToBeEdited!.id,
+                dateOfExpense: _selectedDate,
+                amount: enteredAmount,
+                description: _descriptionController.text,
+                category: _selectedCategory,
+              ),
+            );
+        Navigator.pop(context);
+        return;
+      }
     }
 
+    // if we are not editing and we are creating instead
     final Expense expense = Expense(
+      id: DateTime.now(),
       dateOfExpense: _selectedDate,
       description: _descriptionController.text,
       amount: enteredAmount,
       category: _selectedCategory,
     );
 
-    final response = await _sendRequest(expense);
+    final response = await _sendCreateExpenseRequest(expense);
     if (response.statusCode == 200) {
       ref.read(allExpensesProvider.notifier).createExpense(expense);
       Navigator.pop(context);

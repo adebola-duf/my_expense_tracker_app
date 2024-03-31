@@ -5,7 +5,8 @@ import 'package:my_expense_tracker_app/models/expense.dart';
 class AllExpensesNotifier extends StateNotifier<List<Expense>> {
   AllExpensesNotifier() : super([]);
 
-  void editExpense({required Expense oldExpense, required Expense newExpense}) {
+  void updateExpense(
+      {required Expense oldExpense, required Expense newExpense}) {
     int indexOfExpense = state.indexOf(oldExpense);
 
     var tempAllExpense = [...state];
@@ -68,6 +69,7 @@ class AllExpensesNotifier extends StateNotifier<List<Expense>> {
     for (final expenseMap in allExpensesMap) {
       allExpenses.add(
         Expense(
+          id: DateTime.parse(expenseMap['id']),
           description: expenseMap['description'],
           amount: expenseMap['amount'],
           category: whichCategory(expenseMap['category_name']),

@@ -78,9 +78,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         ref.read(userInfoProvider.notifier).setUserObject(
               User(
                 email: userMap['email'],
-                password: userMap['password'],
-                // firstName: userMap['first_name'],
-                // lastName: userMap['last_name'],
+                firstName: userMap['first_name'],
+                lastName: userMap['last_name'],
               ),
             );
         ref
