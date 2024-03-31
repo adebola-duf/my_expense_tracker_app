@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class AllExpensesNotifier extends StateNotifier<List<Expense>> {
   AllExpensesNotifier() : super([]);
@@ -18,12 +20,11 @@ class AllExpensesNotifier extends StateNotifier<List<Expense>> {
     state = [...state, expense];
   }
 
-  void deleteExpense(Expense expense, BuildContext context) {
+  void deleteExpense(Expense expense, BuildContext context, String userEmail) {
     int expenseIndex = state.indexOf(expense);
     var tempState = [...state];
     tempState.remove(expense);
     state = tempState;
-
     ScaffoldMessenger.of(context).hideCurrentSnackBar();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -45,7 +46,7 @@ class AllExpensesNotifier extends StateNotifier<List<Expense>> {
           textColor: Colors.white,
           backgroundColor: Colors.black,
           onPressed: () {
-            undoDeletingExpense(expense, expenseIndex);
+            undoDeletingExpense(expense, expenseIndex, userEmail);
           },
         ),
         shape: const RoundedRectangleBorder(
@@ -57,10 +58,29 @@ class AllExpensesNotifier extends StateNotifier<List<Expense>> {
     );
   }
 
-  void undoDeletingExpense(Expense expense, int expenseIndex) {
+  void undoDeletingExpense(
+      Expense expense, int expenseIndex, String userEmail) async {
     List<Expense> tempState = [...state];
     tempState.insert(expenseIndex, expense);
     state = tempState;
+    final url = Uri.http('localhost:8000', '/create-expense');
+
+    await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(
+        {
+          'id': expense.id.toString(),
+          'description': expense.description,
+          'category_name': expense.category.name,
+          'amount': expense.amount,
+          'expense_date': expense.dateOfExpense.toString(),
+          'user_email': userEmail,
+        },
+      ),
+    );
   }
 
   void setAllExpenses(List<dynamic> allExpensesMap) {
