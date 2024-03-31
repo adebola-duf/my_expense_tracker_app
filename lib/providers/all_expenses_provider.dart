@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:my_expense_tracker_app/models/expense.dart';
-import 'package:http/http.dart' as http;
 
 class AllExpensesNotifier extends StateNotifier<List<Expense>> {
   AllExpensesNotifier() : super([]);
@@ -16,8 +15,6 @@ class AllExpensesNotifier extends StateNotifier<List<Expense>> {
 
   void createExpense(expense) {
     state = [...state, expense];
-
-    final url = Uri.http('localhost:8000', '/get-expenses');
   }
 
   void deleteExpense(Expense expense, BuildContext context) {
